@@ -1,13 +1,29 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import router from './router';
+
+const logout = () => {
+  localStorage.removeItem('token');
+  router.push('/');
+};
+
+const tokenExists = () => {
+  
+  const token: string | null = JSON.parse(JSON.stringify(localStorage.getItem('token')));
+  console.log('token: ', token);
+  console.log('tokenExists: ', token !== null);
+  
+  return token !== null;
+};
+</script>
 
 <template>
   <v-app>
     <v-toolbar title="Three-way Studio Logistics">
-      <v-btn to="/">Home</v-btn>
-      <v-btn to="/login">Login</v-btn>
-      <v-btn to="/register">Register</v-btn>
       <v-spacer></v-spacer>
-      <v-btn to="/logout">Logout</v-btn>
+      <template v-if="tokenExists()">
+        <v-btn to="/">Home</v-btn>
+        <v-btn @click="logout">Logout</v-btn>
+      </template>
     </v-toolbar>
 
     <v-main class="mt-3">
