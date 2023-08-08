@@ -5,7 +5,7 @@ import Dashboard from './pages/Dashboard.vue';
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: Home
+    component: Dashboard // Home
   },
   {
     path: '/dashboard',

@@ -2,11 +2,8 @@
 import { ref } from 'vue';
 import api from '../services/api.service';
 import router from '../router';
+import { UserTypeEnum } from '../types';
 
-enum UserType {
-  MANUFACTURER = 'MANUFACTURER',
-  TRANSPORTER = 'TRANSPORTER'
-}
 const tabs = ref(2);
 const loginForm = ref();
 const registerForm = ref();
@@ -25,7 +22,7 @@ const rules = {
 
 const userType = ref();
 const userTypeOptions = ref(
-  Object.values(UserType).map((s) => {
+  Object.values(UserTypeEnum).map((s) => {
     return {
       text: `${s.charAt(0).toUpperCase()}${s.toLowerCase().substring(1)}`,
       value: s
@@ -168,7 +165,7 @@ const register = async () => {
             >
             </v-select>
             <v-text-field
-              v-if="userType === UserType.MANUFACTURER"
+              v-if="userType === UserTypeEnum.MANUFACTURER"
               label="Address"
               required
               type="address"
