@@ -7,12 +7,11 @@ const logout = () => {
 };
 
 const tokenExists = () => {
-  
-  const token: string | null = JSON.parse(JSON.stringify(localStorage.getItem('token')));
-  console.log('token: ', token);
-  console.log('tokenExists: ', token !== null);
-  
-  return token !== null;
+  const authPayload: string | null = JSON.parse(
+    JSON.stringify(localStorage.getItem('auth-payload'))
+  );
+
+  return authPayload !== null;
 };
 </script>
 

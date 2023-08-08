@@ -38,13 +38,12 @@ const login = () => {
     ?.validate()
     .then(async (res: { valid: boolean; errors: ProxyConstructor[] }) => {
       if (!res.valid) return;
-      console.log('valid?: ', res.valid);
-      const token = await api.post('/auth/login', {
+      const response = await api.post('/auth/login', {
         email: loginEmail.value,
         password: loginPassword.value
       });
-      if (token) {
-        localStorage.setItem('token', JSON.stringify(token));
+      if (response.data) {
+        localStorage.setItem('auth-payload', JSON.stringify(response.data));
         router.push('/dashboard');
       }
     });
@@ -65,15 +64,15 @@ const register = async () => {
     ?.validate()
     .then(async (res: { valid: boolean; errors: ProxyConstructor[] }) => {
       if (!res.valid) return;
-      const token = await api.post('/auth/register', {
+      const response = await api.post('/auth/register', {
         companyName: companyName.value,
         email: registerEmail.value,
         password: loginPassword.value,
         userType: userType.value,
         address: address.value
       });
-      if (token) {
-        localStorage.setItem('token', JSON.stringify(token));
+      if (response.data) {
+        localStorage.setItem('auth-payload', JSON.stringify(response.data));
         router.push('/dashboard');
       }
     });
@@ -81,7 +80,7 @@ const register = async () => {
 </script>
 
 <template>
-  <v-container grid-list-xs>
+  <v-container grid-list-md>
     <v-card>
       <v-tabs fixed-tabs v-model="tabs">
         <v-tab :value="1">Login</v-tab>

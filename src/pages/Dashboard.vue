@@ -3,10 +3,12 @@ import { ref, onBeforeMount } from 'vue';
 import hashIds from 'hashids';
 import { capitalize } from 'lodash';
 import api from '../services/api.service';
-import { Order, Auth } from '../types';
+import { Order, Auth, UserTypeEnum } from '../types';
 import router from '../router';
 
 const idEncoder = new hashIds(undefined, 8);
+
+const isManufacturer = ref<boolean>(false);
 
 let items = ref<Order[]>([
   {
@@ -28,10 +30,10 @@ let items = ref<Order[]>([
     id: idEncoder.encode(3),
     created_date: '2021-08-01',
     status: 'pending'
-  },
+  }
 ]);
 
-const fetchOrders = async () => {
+const fetchOrders = async (): Promise<Order[]> => {
   const auth: Auth = JSON.parse(JSON.stringify(localStorage.getItem('token')));
   const response = await api.get('http://localhost:3000/orders', {
     headers: {
@@ -42,6 +44,14 @@ const fetchOrders = async () => {
 };
 
 onBeforeMount(async () => {
+  const authPayload = localStorage.getItem('auth-payload');
+  if (!authPayload) {
+    router.push('/');
+  }
+  const user = JSON.parse(JSON.stringify(authPayload));
+  if (user?.type === UserTypeEnum.MANUFACTURER) {
+    isManufacturer.value = true;
+  }
   const orders = await fetchOrders();
   items.value = orders.map((order: Order) => {
     return {
@@ -58,8 +68,13 @@ const handleOrderClicked = (order: Order) => {
 
 <template>
   <v-container grid-list-md>
-    <v-card class="mx-auto mb-2 elevation-0" max-width="1080" row wrap>
-      <!-- <v-toolbar xs12 class=""> -->
+    <v-card
+      v-if="isManufacturer"
+      class="mx-auto mb-2 elevation-0"
+      max-width="1080"
+      row
+      wrap
+    >
       <v-spacer></v-spacer>
       <v-btn
         text=""
@@ -68,7 +83,6 @@ const handleOrderClicked = (order: Order) => {
       >
         New Order
       </v-btn>
-      <!-- </v-toolbar> -->
     </v-card>
     <v-card class="mx-auto" max-width="1080">
       <v-card-title primary-title> Orders </v-card-title>
