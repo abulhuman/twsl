@@ -20,7 +20,7 @@ const tokenExists = () => {
     <v-toolbar title="Three-way Studio Logistics">
       <v-spacer></v-spacer>
       <template v-if="tokenExists()">
-        <v-btn to="/">Home</v-btn>
+        <v-btn to="/dashboard">Dashboard</v-btn>
         <v-btn @click="logout">Logout</v-btn>
       </template>
     </v-toolbar>

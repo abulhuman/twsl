@@ -1,5 +1,6 @@
 {
-  "name": "threeway-studio",
+  "name": "twsl",
+  "description": "twsl - Short for ThreeWay Studio Logistics",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@mdi/font": "^7.2.96",
     "@types/lodash": "^4.14.196",
+    "@types/node": "^20.4.9",
     "@vitejs/plugin-vue": "^4.2.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",

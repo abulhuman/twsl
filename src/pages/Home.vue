@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import api from '../services/api.service';
 import router from '../router';
-import { UserTypeEnum } from '../types';
+import { AuthPayload, UserTypeEnum } from '../types';
+import { login, register } from '../services/auth.service';
 
-const tabs = ref(2);
+const tabs = ref(1);
 const loginForm = ref();
 const registerForm = ref();
 const companyName = ref('');
@@ -33,17 +33,16 @@ const address = ref('');
 
 const showPasswordMismatchError = ref(false);
 
-const login = () => {
+const prepareLogin = () => {
   loginForm.value
     ?.validate()
     .then(async (res: { valid: boolean; errors: ProxyConstructor[] }) => {
       if (!res.valid) return;
-      const response = await api.post('/auth/login', {
+      const authPayload: AuthPayload = await login({
         email: loginEmail.value,
         password: loginPassword.value
       });
-      if (response.data) {
-        localStorage.setItem('auth-payload', JSON.stringify(response.data));
+      if (authPayload) {
         router.push('/dashboard');
       }
     });
@@ -52,7 +51,7 @@ const login = () => {
 
 const passwordsMatch = () => loginPassword.value === repeatPassword.value;
 
-const register = async () => {
+const prepareRegister = async () => {
   if (!passwordsMatch()) {
     showPasswordMismatchError.value = true;
     setTimeout(() => {
@@ -64,15 +63,15 @@ const register = async () => {
     ?.validate()
     .then(async (res: { valid: boolean; errors: ProxyConstructor[] }) => {
       if (!res.valid) return;
-      const response = await api.post('/auth/register', {
+      const authPayload: AuthPayload = await register({
         companyName: companyName.value,
         email: registerEmail.value,
         password: loginPassword.value,
-        userType: userType.value,
-        address: address.value
+        type: userType.value,
+        address: address?.value
       });
-      if (response.data) {
-        localStorage.setItem('auth-payload', JSON.stringify(response.data));
+      if (authPayload) {
+        localStorage.setItem('auth-payload', JSON.stringify(authPayload));
         router.push('/dashboard');
       }
     });
@@ -100,6 +99,8 @@ const register = async () => {
               v-model="loginEmail"
               variant="outlined"
               :rules="[rules.required, rules.email]"
+              role="email"
+              current-username
             ></v-text-field>
             <v-text-field
               label="Password"
@@ -108,11 +109,13 @@ const register = async () => {
               v-model="loginPassword"
               variant="outlined"
               :rules="[rules.minLen, rules.required]"
+              role="password"
+              current-password
             ></v-text-field>
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn flat color="primary" @click="login">Login</v-btn>
+          <v-btn flat color="primary" @click="prepareLogin">Login</v-btn>
         </v-card-actions>
       </template>
       <template v-else>
@@ -182,7 +185,7 @@ const register = async () => {
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn flat color="primary" @click="register">Register</v-btn>
+          <v-btn flat color="primary" @click="prepareRegister">Register</v-btn>
         </v-card-actions>
       </template>
     </v-card>

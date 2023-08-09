@@ -1,54 +1,28 @@
 <script setup lang="ts">
 import { ref, onBeforeMount } from 'vue';
-import hashIds from 'hashids';
+import HashIds from 'hashids';
 import { capitalize } from 'lodash';
-import api from '../services/api.service';
-import { Order, Auth, UserTypeEnum } from '../types';
+import { Order, UserTypeEnum, JwtPayload } from '../types';
 import router from '../router';
+import { fetchOrders } from '../services/order.service';
+import { whoami } from '../services/auth.service';
 
-const idEncoder = new hashIds(undefined, 8);
+const idEncoder = new HashIds('salt', 8);
 
 const isManufacturer = ref<boolean>(false);
 
 let items = ref<Order[]>([
   {
-    id: idEncoder.encode(1),
-    created_date: '2021-08-01',
-    status: 'pending'
-  },
-  {
-    id: idEncoder.encode(2),
-    created_date: '2021-08-01',
-    status: 'pending'
-  },
-  {
-    id: idEncoder.encode(2),
-    created_date: '2021-08-01',
-    status: 'pending'
-  },
-  {
-    id: idEncoder.encode(3),
+    id: idEncoder.encode(-1),
     created_date: '2021-08-01',
     status: 'pending'
   }
 ]);
 
-const fetchOrders = async (): Promise<Order[]> => {
-  const auth: Auth = JSON.parse(JSON.stringify(localStorage.getItem('token')));
-  const response = await api.get('http://localhost:3000/orders', {
-    headers: {
-      Authorization: `Bearer ${auth?.accessToken}`
-    }
-  });
-  return response.data;
-};
+const search = ref('');
 
 onBeforeMount(async () => {
-  const authPayload = localStorage.getItem('auth-payload');
-  if (!authPayload) {
-    router.push('/');
-  }
-  const user = JSON.parse(JSON.stringify(authPayload));
+  const user: JwtPayload = await whoami();
   if (user?.type === UserTypeEnum.MANUFACTURER) {
     isManufacturer.value = true;
   }
@@ -83,6 +57,13 @@ const handleOrderClicked = (order: Order) => {
       >
         New Order
       </v-btn>
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
     </v-card>
     <v-card class="mx-auto" max-width="1080">
       <v-card-title primary-title> Orders </v-card-title>
